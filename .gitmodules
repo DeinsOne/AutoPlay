@@ -1,0 +1,13 @@
+
+# [submodule "Envi"]
+# 	path = autoplay/vendor/Envi
+# 	url = https://github.com/DeinsOne/Envi.git
+
+# [submodule "cxxopts"]
+# 	path = autoplay/vendor/cxxopts
+# 	url = https://github.com/jarro2783/cxxopts.git
+
+# [submodule "jsoncpp"]
+# 	path = autoplay/vendor/jsoncpp
+# 	url = https://github.com/open-source-parsers/jsoncpp.git
+

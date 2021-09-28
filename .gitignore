@@ -1,0 +1,9 @@
+/.vscode
+/tmp
+/bin
+
+/*.sln
+/Makefile
+/*.makefile
+/*.exe
+/*.so
