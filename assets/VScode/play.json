@@ -1,0 +1,28 @@
+{
+    "cfgname" : "Visual studio",
+    "author" : [ "DeinsOne <deinsone@gmail.com>" ],
+    "edition" : "2021.10.06",
+    "version" : "0.1.0",
+
+    "cfg" : {
+        "window" : {
+            "title" : [
+                "visual studio",
+                "code"
+            ],
+            "method" : "WITH_KEYWORDS"
+        },
+
+        "interval" : 60,
+        "recover" : true
+    },
+
+    "targets" : {
+        "branch" :     { "text": "master" }
+    },
+
+    "rules" : {
+        "ShowBranches" :  { "target": "branch", "method": "TEMPLATE_MATCHING", "do": "" }
+    }
+
+}

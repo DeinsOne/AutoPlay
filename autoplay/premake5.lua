@@ -10,13 +10,14 @@ project 'autoplay'
     targetdir   (bindir .. ('/%{cfg.system}-%{cfg.buildcfg}'):lower() )
 
     includedirs {
+        'include',
         'vendor/envi/include',
         'vendor/cxxopts',
         'vendor/jsoncpp/include'
     }
 
     files {
-        'src/autoplay.cpp'
+        'src/main.cpp'
     }
 
     links {
