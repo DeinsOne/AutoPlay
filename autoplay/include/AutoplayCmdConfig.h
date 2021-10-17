@@ -39,6 +39,8 @@ namespace APlay {
             template<typename T>
             inline const T& GetArgument(const char* name) { return _parsed[name].as<T>(); }
 
+            inline const bool& GetArgument(const char* name) { return _parsed[name].count() ? true : false; }
+
         protected:
             CommandLineArguments _input;
             cxxopts::ParseResult _parsed;
@@ -65,5 +67,9 @@ namespace APlay {
             int GetRecover() { return GetArgument<bool>("recover"); }
 
     };
+
+    inline std::shared_ptr<AutoplayCmdConfig> CreateCmdConfig(int argc, char** argv) {
+        return std::make_shared<AutoplayCmdConfig>(argc, argv);
+    }
 
 }

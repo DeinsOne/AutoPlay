@@ -17,7 +17,9 @@ project 'autoplay'
     }
 
     files {
-        'src/main.cpp'
+        'src/main.cpp',
+        'src/AutoplayClient.cpp',
+        'src/AutoplayActionTree.cpp'
     }
 
     links {

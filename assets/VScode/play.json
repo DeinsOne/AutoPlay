@@ -13,16 +13,25 @@
             "method" : "WITH_KEYWORDS"
         },
 
-        "interval" : 60,
-        "recover" : true
+        "interval" : 60
+
     },
 
     "targets" : {
-        "branch" :     { "text": "master" }
+        "branchMaster" :     { "text": "master" },
+        "branchDev" :        { "text": "dev" }
     },
 
     "rules" : {
-        "ShowBranches" :  { "target": "branch", "method": "TEMPLATE_MATCHING", "do": "" }
-    }
+        "ShowBranchesFromMaster" : {
+            "target": [ "branchMaster" ],
+            "do": "Envi::SendInput(Envi::MouseButtonEvent{true, Envi::MouseButtons::LEFT}, std::chrono::microseconds(1))"
+        },
 
+        "ShowBranchesFromDev" : {
+            "target": "branchDev",
+            "do": "Envi::SendInput(Envi::MouseButtonEvent{true, Envi::MouseButtons::LEFT}, std::chrono::microseconds(1))"
+        }
+
+    }
 }

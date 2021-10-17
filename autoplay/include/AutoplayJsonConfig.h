@@ -109,6 +109,13 @@ namespace APlay {
 
     };
 
+    inline std::shared_ptr<AutoplayJsonConfig> CreateJsonConfig(std::string file) {
+        return std::make_shared<AutoplayJsonConfig>(file);
+    }
+
+    inline std::shared_ptr<AutoplayJsonConfig> CreateJsonConfig(const std::shared_ptr<AutoplayCmdConfig>& config) {
+        return std::make_shared<AutoplayJsonConfig>(config);
+    }
 
 }
 

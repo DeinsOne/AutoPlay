@@ -6,37 +6,21 @@
 #include "AutoplayCore.h"
 #include "AutoplayCmdConfig.h"
 #include "AutoplayJsonConfig.h"
+#include "AutoplayClient.h"
+#include "AutoplayActionTree.h"
 
 int main(int argc, char** argv) {
 
-    APlay::AutoplayCmdConfig ccfg(argc, argv);
-    APlay::AutoplayJsonConfig jcfg(std::make_shared<APlay::AutoplayCmdConfig>(ccfg));
+    auto ccfg = APlay::CreateCmdConfig(argc, argv);
+    auto jcfg = APlay::CreateJsonConfig(ccfg);
 
-    printf("Configuration: %s v%s\n", jcfg.GetCfgName(), jcfg.GetVersion() );
-    printf("%s %s\n\n", jcfg.GetAuthor(), jcfg.GetEdition() );
-
-    auto CaptureCfg = Envi::CreateWindowCaptureConfiguration([&]() -> std::vector<Envi::Window> {
-        if (strcmp(jcfg.GetFindTitleMethod(), "WITH_KEYWORDS") == 0) {
-            auto wnds = Envi::GetWindowsWithNameKeywords(jcfg.GetWindowTitle());
-            if (wnds.size()) { printf("Found: %s\n", wnds.at(0).Name ); }
-            return wnds;
-        }
-        else if (strcmp(jcfg.GetFindTitleMethod(), "MATCH") == 0) {
-            auto wnds = Envi::GetWindowsWithNameContains(jcfg.GetWindowTitle().at(0) );
-            if (wnds.size()) { printf("Found: %s\n", wnds.at(0).Name ); }
-            return wnds;
-        }
-    });
-
-    // Start capturing
-    auto CaptureManager = CaptureCfg->SetTickInterval(jcfg.GetInterval() )->SetRecoverImages(jcfg.GetRecover() )->startCapturing();
+    auto aClient = APlay::CreateAutoplayClient(jcfg);
 
     while (true) {
         if (Envi::IsKeyPressed(Envi::KeyCodes::KEY_LeftControl) &&
             Envi::IsKeyPressed(Envi::KeyCodes::KEY_W)
-        ) { break; }
-
-        std::this_thread::sleep_for(std::chrono::milliseconds(30));
+        ) { aClient->Pause(); printf("\ndetected ctrl+w. Exit\n"); break; }
+        std::this_thread::sleep_for(std::chrono::milliseconds(jcfg->GetInterval()));
     }
 
     return 0;
