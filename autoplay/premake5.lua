@@ -27,6 +27,10 @@ project 'autoplay'
         'json'
     }
 
+    linkoptions {
+        '-fpermissive'
+    }
+
     filter 'system:linux'
         links {
             'pthread'

@@ -1,13 +1,26 @@
 #include "AutoplayActionTree.h"
+#include "AutoplayCore.h"
 
 namespace APlay {
 
     namespace ActionTree {
 
         #define __prefix "ActionTree err -> "
-        #define __badType(entt) __prefix entt ": bad type"
-        #define __badFields(entt) __prefix entt ": bad fields"
-        #define __badCollision(entt) __prefix entt ": bad collision"
+
+        std::string __badFields(std::string name, std::string where) {
+            return (__prefix "bad fields. where: " + where + " field: " + name);
+        }
+        std::string __badFieldType(std::string name, std::string where,std::string expected) {
+            return (__prefix "bad type. where: " + where + " field: " + name + " expected: " + expected);
+        }
+
+        std::string __fieldsCollision(std::string names) {
+            return (__prefix + names + ": bad collision");
+        }
+        std::string __missedFiled(std::string name, std::string where) {
+            (__prefix "missed fields: " + name + " where: " + where);
+        }
+
 
         AMethod __detectMethod(std::string str) {
             if (str.compare("TEMPLATE_MATCHING")) return AMethod::AMethod_TemplateMatching;
@@ -22,7 +35,7 @@ namespace APlay {
         int ATarget::operator<<(Json::Value component) {
 
             if (!component["image"].empty() && !component["text"].empty() ) {
-                throw ActionTreeException(__badCollision("text/iamge"));
+                throw ActionTreeException(__fieldsCollision("text/iamge"));
             }
 
             // Image field
@@ -32,10 +45,10 @@ namespace APlay {
                 // _image = reinterpret_cast<const unsigned char*>(component["image"].asCString());
             }
             else if (!component["image"].empty() && !component["image"].isString() ) {
-                throw ActionTreeException(__badType("image"));
+                throw ActionTreeException(__badFieldType("image", "targets." + _name + ".image", "string"));
             }
             else if (component["image"].empty() && component["text"].empty() ) {
-                throw ActionTreeException(__badFields("image/text"));
+                throw ActionTreeException(__badFields("image/text", "targets." + _name));
             }
 
             // Text field
@@ -44,10 +57,10 @@ namespace APlay {
                 _text = component["text"].asString();           
             }
             else if (!component["text"].empty() && !component["text"].isString() ) {
-                throw ActionTreeException(__badType("text"));
+                throw ActionTreeException(__badFieldType("text", "targets." + _name + ".text", "string"));
             }
             else if (component["image"].empty() && component["text"].empty() ) {
-                throw ActionTreeException(__badFields("image/text"));
+                throw ActionTreeException(__badFields("image/text", _name + ".text"));
             }
 
             return 0;
@@ -70,11 +83,11 @@ namespace APlay {
                     }
                 }
                 else {
-                    throw ActionTreeException(__badFields("target"));
+                    throw ActionTreeException(__badFields("target", "rules." + _name + ".do"));
                 }
             }
             else {
-                throw ActionTreeException(__badFields("target"));
+                throw ActionTreeException(__missedFiled("target", "rules." + _name + ".do"));
             }
 
             // method
@@ -82,7 +95,7 @@ namespace APlay {
                 _method = __detectMethod(component["method"].asString());
             }
             else if (!component["method"].empty() && !component["method"].isString() ) {
-                throw ActionTreeException(__badType("method"));
+                throw ActionTreeException(__badFieldType("method", "rules." + _name + ".method", "string"));
             }
             else {
                 _method = AMethod::AMethod_None;
@@ -93,10 +106,10 @@ namespace APlay {
                 _do = component["do"].asString();
             }
             else if (!component["do"].empty() && !component["do"].isString()) {
-                throw ActionTreeException(__badType("do"));
+                throw ActionTreeException(__badFieldType("do", "rules." + _name + ".do", "string"));
             }
             else {
-                throw ActionTreeException(__badFields("do"));
+                throw ActionTreeException(__missedFiled("do", "rules." + _name + ".do"));
             }
 
             return 0;
@@ -105,15 +118,15 @@ namespace APlay {
         int ActionTree::operator<<(std::shared_ptr<APlay::AutoplayJsonConfig> config) {
             for (int i = 0; i < config->GetRoot("")["targets"].getMemberNames().size(); i++ ) {
                 ATarget target;
-                target << config->GetRoot("")["targets"][config->GetRoot("")["targets"].getMemberNames().at(i)];
                 target << config->GetRoot("")["targets"].getMemberNames()[i];
+                target << config->GetRoot("")["targets"][config->GetRoot("")["targets"].getMemberNames().at(i)];
                 _targetTree._targets.insert({ {target._name, target} } );
             }
 
             for (int i = 0; i < config->GetRoot("")["rules"].getMemberNames().size(); i++ ) {
                 ARule rule;
-                rule << config->GetRoot("")["rules"][config->GetRoot("")["rules"].getMemberNames().at(i)];
                 rule << config->GetRoot("")["rules"].getMemberNames().at(i).c_str();
+                rule << config->GetRoot("")["rules"][config->GetRoot("")["rules"].getMemberNames().at(i)];
                 _ruleTree._rules.insert({ {rule._name, rule} } );
             }            
         }
@@ -122,21 +135,21 @@ namespace APlay {
         std::shared_ptr<ActionTree> CreateActionTree(std::shared_ptr<APlay::AutoplayJsonConfig> config) {
             auto tree = std::make_shared<ActionTree>();
 
-            for (int i = 0; i < config->GetRoot("")["targets"].getMemberNames().size(); i++ ) {
-                ATarget target;
-                target << config->GetRoot("")["targets"][config->GetRoot("")["targets"].getMemberNames().at(i)];
-                target << config->GetRoot("")["targets"].getMemberNames()[i];
+            // for (int i = 0; i < config->GetRoot("")["targets"].getMemberNames().size(); i++ ) {
+            //     ATarget target;
+            //     target << config->GetRoot("")["targets"].getMemberNames()[i];
+            //     target << config->GetRoot("")["targets"][config->GetRoot("")["targets"].getMemberNames().at(i)];
 
-                tree->_targetTree._targets.insert({ {target._name, target} } );
-            }
+            //     tree->_targetTree._targets.insert({ {target._name, target} } );
+            // }
 
-            for (int i = 0; i < config->GetRoot("")["rules"].getMemberNames().size(); i++ ) {
-                ARule rule;
-                rule << config->GetRoot("")["rules"][config->GetRoot("")["rules"].getMemberNames().at(i)];
-                rule << config->GetRoot("")["rules"].getMemberNames().at(i).c_str();
+            // for (int i = 0; i < config->GetRoot("")["rules"].getMemberNames().size(); i++ ) {
+            //     ARule rule;
+            //     rule << config->GetRoot("")["rules"].getMemberNames().at(i).c_str();
+            //     rule << config->GetRoot("")["rules"][config->GetRoot("")["rules"].getMemberNames().at(i)];
 
-                tree->_ruleTree._rules.insert({ {rule._name, rule} } );
-            }
+            //     tree->_ruleTree._rules.insert({ {rule._name, rule} } );
+            // }
 
 
             return tree;
