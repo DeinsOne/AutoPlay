@@ -7,22 +7,9 @@
 #include "AutoplayCmdConfig.h"
 #include "AutoplayJsonConfig.h"
 #include "AutoplayClient.h"
-#include "AutoplayActionTree.h"
+// #include "AutoplayActionTree.h"
 
 #include "ecs/uecs.h"
-
-class String : public APlay::Ecs::Component {
-    protected:
-        std::string _value;
-
-    public:
-        String(std::string name, std::string value = "") : Component(name), _value(value) { }
-
-        std::string GetValue() const { return _value; }
-
-        void SetValue(const std::string& value) { _value = value; }
-
-};
 
 int main(int argc, char** argv) {
 

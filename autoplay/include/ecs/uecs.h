@@ -17,14 +17,19 @@ namespace APlay {
 
         using ComponentTypeID = std::size_t;
 
-        ComponentTypeID __hashString(const std::string& st) {
+        inline ComponentTypeID __hashString(const std::string& st) {
             static std::hash<std::string> _hasher;
             return _hasher(st);
         }
 
         template<typename T>
-        ComponentTypeID __getComponentTypeID() {
+        inline ComponentTypeID __getComponentTypeID() {
             return __hashString(typeid(T).name());
+        }
+
+        inline std::string _toLower(std::string convert) {
+            std::for_each(convert.begin(), convert.end(), [](char & c) { c = ::tolower(c); } );
+            return convert;
         }
 
         class Component {
@@ -91,6 +96,28 @@ namespace APlay {
                         );
                         return iter != components->at(__getComponentTypeID<T>())->end() ? true : false;
                     }
+                    return false;
+                }
+
+                bool hasComponent(std::string identifier) const {
+                    bool _found = false;
+
+                    std::for_each(componentTypes->begin(), componentTypes->end(), 
+                        [&](const Ecs::ComponentTypeID& id) {
+                            if (_found) return;
+
+                            std::for_each(components->at(id)->begin(), components->at(id)->end(),
+                                [&](const std::unique_ptr<Ecs::Component>& cp) {
+                                    if (_found || cp->getIdentifier() == identifier) {
+                                        _found = true;
+                                        return;
+                                    }
+                                }
+                            );
+                        }
+                    );
+
+                    return _found;
                 }
 
                 template<typename T>

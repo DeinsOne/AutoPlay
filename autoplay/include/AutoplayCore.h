@@ -2,23 +2,21 @@
 #define __AUTOPLAY_CORE
 
 #include <memory>
+#include "ecs/uecs.h"
+#include "ecs/components.h"
+
 
 namespace APlay {
-
-    // namespace ActionTree {
-        // #define __prefix "ActionTree err -> "
-// 
-        // #define __badFields(name, where) __prefix name ": bad fields"
-        // #define __badFieldType(name, where, expected) __prefix name ": bad type"
-// 
-        // #define __fieldsCollision(names) __prefix names ": bad collision"
-        // #define __missedFiled(name, where) ""
-    // }
 
     template<typename T>
     class IParser {
         public:
             virtual T Init() = 0;
+
+            virtual std::shared_ptr<Ecs::Entity> GetRoot() { return _root; }
+
+        protected:
+            std::shared_ptr<Ecs::Entity> _root;
     };
 
 }

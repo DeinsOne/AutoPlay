@@ -18,8 +18,10 @@ project 'autoplay'
 
     files {
         'src/main.cpp',
+        'src/AutoplayCmdConfig.cpp',
+        'src/AutoplayJsonConfig.cpp',
         'src/AutoplayClient.cpp',
-        'src/AutoplayActionTree.cpp'
+        -- 'src/AutoplayActionTree.cpp'
     }
 
     links {

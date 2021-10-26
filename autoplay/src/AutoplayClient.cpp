@@ -25,28 +25,31 @@ namespace APlay {
             void _Start() {
                 _thread = std::thread([&]() {
 
-                    printf("Configuration: %s v%s\n", _config->GetCfgName(), _config->GetVersion() );
-                    printf("%s %s\n\n", _config->GetAuthor(), _config->GetEdition() );
+                    printf("Configuration: %s v%s\n", _config->GetCfgName().c_str(), _config->GetVersion().c_str() );
+                    printf("%s %s\n\n", _config->GetAuthor().at(0).c_str(), _config->GetEdition().c_str() );
 
-                    _actionTree = ActionTree::CreateActionTree(_config);
+                    // _actionTree = ActionTree::CreateActionTree(_config);
 
                     auto capConfig = Envi::CreateWindowCaptureConfiguration([&]() -> std::vector<Envi::Window> {
-                        if (strcmp(_config->GetFindTitleMethod(), "WITH_KEYWORDS") == 0) {
-                            auto wnds = Envi::GetWindowsWithNameKeywords(_config->GetWindowTitle());
-                            if (wnds.size()) { printf("Found: %s\n", wnds.at(0).Name ); }
-                            return wnds;
+                        std::vector<Envi::Window> windows;
+
+                        switch (_config->GetFindTitleMethodInt()) {
+                            case (AutoplayClientFindWindowMethod::WithKeywords): {
+                                windows = Envi::GetWindowsWithNameKeywords(_config->GetWindowTitle());
+                                break;
+                            }
+                            case (AutoplayClientFindWindowMethod::Match): {
+                                windows = Envi::GetWindowsWithNameContains(_config->GetWindowTitle().at(0));
+                                break;
+                            }
+                            case (AutoplayClientFindWindowMethod::None): {
+                                windows = Envi::GetWindowsWithNameKeywords(_config->GetWindowTitle());
+                                break;
+                            }
                         }
-                        else if (strcmp(_config->GetFindTitleMethod(), "MATCH") == 0) {
-                            auto wnds = Envi::GetWindowsWithNameContains(_config->GetWindowTitle().at(0) );
-                            if (wnds.size()) { printf("Found: %s\n", wnds.at(0).Name ); }
-                            return wnds;
-                        }
-                        // Default method WITH_KEYWORDS
-                        else {
-                            auto wnds = Envi::GetWindowsWithNameKeywords(_config->GetWindowTitle());
-                            if (wnds.size()) { printf("Found: %s\n", wnds.at(0).Name ); }
-                            return wnds;
-                        }
+
+                        if (windows.size()) { printf("Found: %s\n", windows.at(0).Name ); }
+                        return windows;
                     });
 
                     // capConfig->OnNewFrame([&](const Envi::Image &img, const Envi::Window &window) { });
@@ -77,7 +80,7 @@ namespace APlay {
             std::shared_ptr<AutoplayJsonConfig> _config;
             std::shared_ptr<Envi::ICapturerManager> _captureManager;
 
-            std::shared_ptr<ActionTree::ActionTree> _actionTree;
+            // std::shared_ptr<ActionTree::ActionTree> _actionTree;
 
     };
 

@@ -4,6 +4,12 @@
 
 namespace APlay {
 
+    enum AutoplayClientFindWindowMethod {
+        None = 0,
+        WithKeywords,
+        Match
+    };
+
     class IAutoplayClient {
         public:
             virtual void Pause() = 0;
