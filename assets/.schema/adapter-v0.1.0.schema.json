@@ -1,0 +1,35 @@
+{
+    "description": "Schema for cfg property of configuration",
+    "type": "object",
+    "properties": {
+        "type": {
+            "description": "Method defining device type",
+            "enum": [
+                "desktop",
+                "android",
+                "ios"
+            ]
+        },
+        "title": {
+            "description": "Window titles",
+            "type": "array",
+            "items": {
+                "type": "string"
+            },
+            "minItems": 1,
+            "uniqueItems": true
+        },
+        "method": {
+            "description": "Method by which window will be detected",
+            "enum": [
+                "MATCH",
+                "match",
+                "WITH_KEYWORDS",
+                "with_keywords"
+            ]
+        }
+    },
+    "required": [
+        "type"
+    ]
+}

@@ -10,13 +10,19 @@ project 'autoplay'
     targetdir   (bindir .. ('/%{cfg.system}-%{cfg.buildcfg}'):lower() )
 
     includedirs {
+        'include',
         'vendor/envi/include',
         'vendor/cxxopts',
-        'vendor/jsoncpp/include'
+        'vendor/jsoncpp/include',
+        'vendor/valijson'
     }
 
     files {
-        'src/autoplay.cpp'
+        'src/Autoplay.cpp',
+        'src/AutoplayCmdConfig.cpp',
+        'src/AutoplayJsonConfig.cpp',
+        'src/AutoplayClient.cpp',
+        'src/AutoplayActionTree.cpp'
     }
 
     links {
@@ -25,11 +31,18 @@ project 'autoplay'
     }
 
     filter 'system:linux'
+        linkoptions {
+            '-fpermissive'
+        }
+
         links {
             'pthread'
         }
 
     filter 'configurations:Debug'
+        defines {
+            '_DEBUG'
+        }
 		runtime 'Debug'
 		symbols 'on'
 

@@ -1,0 +1,34 @@
+{
+    "title" : "Visual studio",
+    "author" : [ "DeinsOne <deinsone@gmail.com>" ],
+    "edition" : "2021.10.06",
+    "version" : "0.1.0",
+
+    "adapter" : {
+        "type": "desktop",
+        "window" : [
+            "visual studio",
+            "code"
+        ],
+        "method" : "with_keywords"
+    },
+
+    "interval" : 90,
+
+    "targets" : {
+        "branchMaster" :     { "text": "master" },
+        "branchDev" :        { "text": "dev" }
+    },
+
+    "rules" : {
+        "ShowBranchesFromMaster" : {
+            "target": [ "branchMaster" ],
+            "command": "print(\"Switching to branch master..\")"
+        },
+
+        "ShowBranchesFromDev" : {
+            "target": [ "branchDev" ],
+            "script": "assets/VScode/rules/switch2Dev.lua"
+        }
+    }
+}

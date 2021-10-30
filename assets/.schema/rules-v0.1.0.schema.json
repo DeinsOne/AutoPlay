@@ -1,0 +1,28 @@
+{
+    "description": "Schema for rules instances of configuration",
+    "type": "object",
+    "patternProperties": {
+        "target": {
+            "decription": "Target for current rule",
+            "type": "array",
+            "items": {
+                "type": "string"
+            },
+            "minItems": 0,
+            "uniqueItems": true
+        },
+        "script": {
+            "decription": "Executes when all rule's targets detected",
+            "type": "string"
+        },
+        "command": {
+            "decription": "Lua line to execute",
+            "type": "string"
+        }
+    },
+    "required": [
+        "target"
+    ],
+    "minProperties": 2,
+    "maxProperties": 3
+}
