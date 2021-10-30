@@ -22,7 +22,7 @@ int main(int argc, char** argv) {
             Envi::IsKeyPressed(Envi::KeyCodes::KEY_W)
         ) {
             aClient->Pause();
-            printf("\ndetected ctrl+w. Exit\n");
+            printf("\n\ndetected ctrl+w. Exit\n");
             break;
         }
         std::this_thread::sleep_for(std::chrono::milliseconds(jcfg->GetInterval()));

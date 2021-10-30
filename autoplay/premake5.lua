@@ -14,7 +14,8 @@ project 'autoplay'
         'vendor/envi/include',
         'vendor/cxxopts',
         'vendor/jsoncpp/include',
-        'vendor/valijson'
+        'vendor/valijson',
+        'vendor/indicators/include'
     }
 
     files {
@@ -22,7 +23,8 @@ project 'autoplay'
         'src/AutoplayCmdConfig.cpp',
         'src/AutoplayJsonConfig.cpp',
         'src/AutoplayClient.cpp',
-        'src/AutoplayActionTree.cpp'
+        'src/AutoplayActionTree.cpp',
+        'src/AutoplayCmdVisializer.cpp'
     }
 
     links {

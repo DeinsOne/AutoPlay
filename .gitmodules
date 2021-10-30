@@ -15,3 +15,6 @@
 	path = autoplay/vendor/valijson
 	url = https://github.com/tristanpenman/valijson
 
+[submodule "indicators"]
+	path = autoplay/vendor/indicators
+	url = https://github.com/p-ranav/indicators.git
