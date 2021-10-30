@@ -18,10 +18,11 @@ project 'autoplay'
     }
 
     files {
-        'src/main.cpp',
+        'src/Autoplay.cpp',
         'src/AutoplayCmdConfig.cpp',
         'src/AutoplayJsonConfig.cpp',
         'src/AutoplayClient.cpp',
+        'src/AutoplayActionTree.cpp'
     }
 
     links {
@@ -39,6 +40,9 @@ project 'autoplay'
         }
 
     filter 'configurations:Debug'
+        defines {
+            '_DEBUG'
+        }
 		runtime 'Debug'
 		symbols 'on'
 

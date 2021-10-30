@@ -39,11 +39,13 @@
         },
         "targets": {
             "description": "Targets schema",
-            "type": "object"
+            "type": "object",
+            "minProperties": 1
         },
         "rules": {
             "description": "Targets schema",
-            "type": "object"
+            "type": "object",
+            "minProperties": 1
         }
     },
     "required": [

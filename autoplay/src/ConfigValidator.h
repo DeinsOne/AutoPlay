@@ -18,7 +18,7 @@ namespace APlay {
     class ConfigValidator {
         public:
             static const Json::Value* fetchDocumentJson(const std::string &uri) {
-                std::cout << "Fetching " << uri << "..." << std::endl;
+                // std::cout << "Fetching " << uri << "..." << std::endl;
                 Json::Value* _value = new Json::Value();
 
                 if (!valijson::utils::loadDocument(uri.substr(0, 7) == "file://" ? uri.substr(7, uri.size()) : uri, *_value)) { return nullptr; }

@@ -1,115 +1,59 @@
 #pragma once
 #include "AutoplayCore.h"
 #include "AutoplayJsonConfig.h"
-#include <vector>
-#include <string>
+#include "ecs/uecs.h"
 
-#include <unordered_map>
 #include <memory>
 #include <exception>
 #include <iostream>
 
 namespace APlay {
 
-    namespace ActionTree {
+    struct ActionTreeBaseComponent {
+        bool _active = true;
+    };
 
-        enum AMethod {
-            AMethod_None = 0,
-            AMethod_TemplateMatching // TEMPLATE_MATCHING
-        };
+    struct Target : public ActionTreeBaseComponent{
+        std::string _text;
+        std::string _path;
+        // TODO: add pointer to loaded image from path
+    };
 
-        enum ATargetType {
-            ATargetType_None = 0,
-            ATargetType_Text,
-            ATargetType_Resource
-        };
+    class TargetComponent : public Ecs::Component, public Target {
+        public:
+            TargetComponent(std::string id, const Json::Value& target);
+    };
 
-        class ANodeBase {
-            public:
-                AMethod _method;
-                std::string _name;
-        };
+    struct Rule : public ActionTreeBaseComponent {
+        std::string _command;
+        std::string _script;
+        std::vector<std::string> _target;
+        // TODO: add lua state for rule
+    };
 
-        class ATarget : public ANodeBase {
-            public:
-                ATargetType _type;
-                std::string _text;
-                // FIXME: alternative format
-                const unsigned char* _image;
+    class RuleComponent : public Ecs::Component, public Rule {
+        public:
+            RuleComponent(std::string id, const Json::Value& rule);
+    };
 
-                ATarget& operator =(const ATarget& eq) {
-                    _type = eq._type;
-                    _text = eq._text;  
-                    _image = eq._image;
-                    _method = eq._method;
-                    _name = eq._name;
-                }
+    class ActionTree {
+        public:
+            ActionTree(const Json::Value& _config) { init(_config); }
+            ActionTree(const std::shared_ptr<AutoplayJsonConfig>& _config) { init(_config->GetJson()); }
 
-                int operator<<(Json::Value component);
-                int operator<<(std::string name);
-        };
+            std::shared_ptr<Ecs::Entity> _registry;
 
-        class ARule : public ANodeBase {
-            public:
-                std::vector<std::string> _targetName;
-                // FIXME: provide action type
-                std::string _do;
-
-                ARule& operator =(const ARule& eq) {
-                    _targetName = eq._targetName;
-                    _do = eq._do;  
-                    _method = eq._method;
-                    _name = eq._name;
-                }
-
-                int operator<<(Json::Value component);
-                int operator<<(const char* name);
-
-        };
-
-        // inline std::string GetHash(ANodeBase node) { return node._name; };
-        // inline ANodeBase  HashToBase(std::string hash) {};
-        // inline std::string GetName(std::string hash) { return ""; };
-        // inline std::string GetMethod(std::string hash) { return ""; };
-
-        /**
-         * Container for tagets. 
-         * Hash is lowercase string which represent target name and method. Shapes as: std::string("target._name" + "_" + "target._method").lower()
-        */
-        class TargetTree {
-            public:
-                std::unordered_map<std::string, ATarget> _targets;
-        };
-
-        class RuleTree {
-            public:
-                std::unordered_map<std::string, ARule> _rules;
-        };
-
-        class ActionTree {
-            public:
-                TargetTree  _targetTree;
-                RuleTree    _ruleTree;
-
-                int operator<<(std::shared_ptr<APlay::AutoplayJsonConfig> config);
-        };
+        private:
+            void init(const Json::Value& _config);
+    };
 
 
-        std::shared_ptr<ActionTree> CreateActionTree(std::shared_ptr<APlay::AutoplayJsonConfig> config);
-
-        class ActionTreeException : virtual public std::exception {
-            protected:
-                std::string msg;
-
-            public:
-                explicit ActionTreeException(std::string _what) : msg(_what) {
-                }
-
-                virtual ~ActionTreeException() throw () {}
-
-                virtual const char* what() const throw () { return msg.c_str(); }
-
-        };
-
+    inline std::shared_ptr<ActionTree> CreateActionTree(const Json::Value& config) {
+        return std::make_shared<ActionTree>(config);
     }
-} // APlay
+
+    inline std::shared_ptr<ActionTree> CreateActionTree(const std::shared_ptr<AutoplayJsonConfig> config) {
+        return std::make_shared<ActionTree>(config);
+    }
+
+}

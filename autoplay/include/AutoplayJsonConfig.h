@@ -44,6 +44,9 @@ namespace APlay {
             int GetInterval();
             bool GetRecover();
 
+            inline Json::Value GetJson() const {
+                return _jsvalue;
+            }
     };
 
     std::shared_ptr<AutoplayJsonConfig> CreateJsonConfig(std::string file);

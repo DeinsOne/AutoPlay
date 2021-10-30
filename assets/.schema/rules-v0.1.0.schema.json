@@ -11,14 +11,18 @@
             "minItems": 0,
             "uniqueItems": true
         },
-        "execute": {
+        "script": {
             "decription": "Executes when all rule's targets detected",
+            "type": "string"
+        },
+        "command": {
+            "decription": "Lua line to execute",
             "type": "string"
         }
     },
     "required": [
-        "target",
-        "execute"
+        "target"
     ],
-    "minProperties": 1
+    "minProperties": 2,
+    "maxProperties": 3
 }

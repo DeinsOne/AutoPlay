@@ -13,7 +13,7 @@
         "method" : "with_keywords"
     },
 
-    "interval" : 60,
+    "interval" : 90,
 
     "targets" : {
         "branchMaster" :     { "text": "master" },
@@ -23,12 +23,12 @@
     "rules" : {
         "ShowBranchesFromMaster" : {
             "target": [ "branchMaster" ],
-            "execute": "Envi::SendInput(Envi::MouseButtonEvent{true, Envi::MouseButtons::LEFT}, std::chrono::microseconds(1))"
+            "command": "print(\"Switching to branch master..\")"
         },
 
         "ShowBranchesFromDev" : {
             "target": [ "branchDev" ],
-            "execute": "Envi::SendInput(Envi::MouseButtonEvent{true, Envi::MouseButtons::LEFT}, std::chrono::microseconds(1))"
+            "script": "assets/VScode/rules/switch2Dev.lua"
         }
     }
 }

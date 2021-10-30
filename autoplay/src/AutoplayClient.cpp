@@ -25,10 +25,22 @@ namespace APlay {
             void _Start() {
                 _thread = std::thread([&]() {
 
-                    printf("\nConfiguration: %s v%s\n", _config->GetTitle().c_str(), _config->GetVersion().c_str() );
+                    printf("Configuration: %s v%s\n", _config->GetTitle().c_str(), _config->GetVersion().c_str() );
                     printf("%s %s\n\n", _config->GetAuthor().at(0).c_str(), _config->GetEdition().c_str() );
 
-                    // _actionTree = ActionTree::CreateActionTree(_config);
+                    _actionTree = CreateActionTree(_config);
+
+                    #if defined(_DEBUG)
+                        printf("Debug info\n");
+
+                        printf("  Targets: %d, rules: %d\n",
+                            _actionTree->_registry->getComponentArraySize<TargetComponent>(),
+                            _actionTree->_registry->getComponentArraySize<RuleComponent>()
+                        );
+
+                        printf("  Refresh: %dtps\n", (int)(1000 / _config->GetInterval()) );
+                        printf("  Recover: %s\n\n", _config->GetRecover() ? "true" : "false" );
+                    #endif
 
                     auto capConfig = Envi::CreateWindowCaptureConfiguration([&]() -> std::vector<Envi::Window> {
                         std::vector<Envi::Window> windows;
@@ -52,7 +64,7 @@ namespace APlay {
                         return windows;
                     });
 
-                    // capConfig->OnNewFrame([&](const Envi::Image &img, const Envi::Window &window) { });
+                    capConfig->OnNewFrame([&](const Envi::Image &img, const Envi::Window &window) { });
 
                     capConfig->SetTickInterval(_config->GetInterval());
                     capConfig->SetRecoverImages(_config->GetRecover());
@@ -80,7 +92,7 @@ namespace APlay {
             std::shared_ptr<AutoplayJsonConfig> _config;
             std::shared_ptr<Envi::ICapturerManager> _captureManager;
 
-            // std::shared_ptr<ActionTree::ActionTree> _actionTree;
+            std::shared_ptr<ActionTree> _actionTree;
 
     };
 
