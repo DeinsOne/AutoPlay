@@ -13,7 +13,8 @@ project 'autoplay'
         'include',
         'vendor/envi/include',
         'vendor/cxxopts',
-        'vendor/jsoncpp/include'
+        'vendor/jsoncpp/include',
+        'vendor/valijson'
     }
 
     files {
@@ -21,7 +22,6 @@ project 'autoplay'
         'src/AutoplayCmdConfig.cpp',
         'src/AutoplayJsonConfig.cpp',
         'src/AutoplayClient.cpp',
-        -- 'src/AutoplayActionTree.cpp'
     }
 
     links {
@@ -29,11 +29,11 @@ project 'autoplay'
         'json'
     }
 
-    linkoptions {
-        '-fpermissive'
-    }
-
     filter 'system:linux'
+        linkoptions {
+            '-fpermissive'
+        }
+
         links {
             'pthread'
         }

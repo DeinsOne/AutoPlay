@@ -10,6 +10,11 @@ namespace APlay {
         Match
     };
 
+    enum AutoplayAdapterType {
+        AdapterNone = 0,
+        AdapterDesktop
+    };
+
     class IAutoplayClient {
         public:
             virtual void Pause() = 0;

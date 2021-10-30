@@ -1,0 +1,24 @@
+{
+    "description": "Schema for rules instances of configuration",
+    "type": "object",
+    "patternProperties": {
+        "target": {
+            "decription": "Target for current rule",
+            "type": "array",
+            "items": {
+                "type": "string"
+            },
+            "minItems": 0,
+            "uniqueItems": true
+        },
+        "execute": {
+            "decription": "Executes when all rule's targets detected",
+            "type": "string"
+        }
+    },
+    "required": [
+        "target",
+        "execute"
+    ],
+    "minProperties": 1
+}

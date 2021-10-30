@@ -1,5 +1,6 @@
 #include "AutoplayJsonConfig.h"
 #include "AutoplayClient.h"
+#include "ConfigValidator.h"
 
 namespace APlay {
 
@@ -47,8 +48,9 @@ namespace APlay {
         configFile >> _jsvalue;
         configFile.close();
 
+        ConfigValidator valid(_file, _jsvalue);
 
-        initValue<std::string>("cfgname", _jsvalue, _root.get(),
+        initValue<std::string>("title", _jsvalue, _root.get(),
             _JsonValueType::_value_singel
         );
 
@@ -64,27 +66,31 @@ namespace APlay {
             _JsonValueType::_value_singel | _JsonValueType::_value_array
         );
 
-        initValue<int>("interval", _jsvalue["cfg"], _root.get(),
+        initValue<int>("interval", _jsvalue, _root.get(),
             _JsonValueType::_value_singel
         );
 
-        initValue<bool>("recover", _jsvalue["cfg"], _root.get(),
+        initValue<bool>("recover", _jsvalue, _root.get(),
             _JsonValueType::_value_singel
         );
 
-        initValue<std::string>("title", _jsvalue["cfg"]["window"], _root.get(),
+        initValue<std::string>("type", _jsvalue["adapter"], _root.get(),
+            _JsonValueType::_value_singel
+        );
+
+        initValue<std::string>("window", _jsvalue["adapter"], _root.get(),
             _JsonValueType::_value_array
         );
 
-        initValue<std::string>("method", _jsvalue["cfg"]["window"], _root.get(),
+        initValue<std::string>("method", _jsvalue["adapter"], _root.get(),
             _JsonValueType::_value_singel 
         );
 
         return JsonReader{};
     }
 
-    std::string AutoplayJsonConfig::GetCfgName() {
-        return _root->getComponent<Ecs::String>("cfgname")->GetValue();
+    std::string AutoplayJsonConfig::GetTitle() {
+        return _root->getComponent<Ecs::String>("title")->GetValue();
     }
 
     std::vector<std::string> AutoplayJsonConfig::GetAuthor() {
@@ -113,8 +119,15 @@ namespace APlay {
         else return _cmdconfig->GetRecover();
     }
 
+    int AutoplayJsonConfig::GetAdapterType() {
+        if (_root->getComponent<Ecs::String>("type")->GetValue().compare("desktop"))
+            return AutoplayAdapterType::AdapterDesktop;
+        else
+            return AutoplayAdapterType::AdapterNone;
+    }
+
     std::vector<std::string> AutoplayJsonConfig::GetWindowTitle() {
-        return _root->getComponent<Ecs::Array<std::string>>("title")->GetValue();
+        return _root->getComponent<Ecs::Array<std::string>>("window")->GetValue();
     }
 
     std::string AutoplayJsonConfig::GetFindTitleMethod() {

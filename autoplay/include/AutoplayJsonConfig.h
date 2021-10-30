@@ -33,12 +33,13 @@ namespace APlay {
 
             AutoplayJsonConfig(const std::shared_ptr<AutoplayCmdConfig>& config) : JsonParser(config->GetCfgFile().c_str()), _cmdconfig(config) { Init(); }
 
-            std::string GetCfgName(); 
+            std::string GetTitle(); 
             std::vector<std::string> GetAuthor();
             std::vector<std::string> GetWindowTitle();
             std::string GetFindTitleMethod();
             std::string GetEdition();
             std::string GetVersion();
+            int GetAdapterType();
             int GetFindTitleMethodInt();
             int GetInterval();
             bool GetRecover();

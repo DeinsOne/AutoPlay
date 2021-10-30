@@ -1,0 +1,56 @@
+{
+    "description": "Main schema for configuration",
+    "type": "object",
+    "properties": {
+        "title": {
+            "description": "Name/id of specified configuration",
+            "type": "string"
+        },
+        "author": {
+            "description": "Authors of configuration",
+            "type": "array",
+            "items": {
+                "type": "string"
+            },
+            "minItems": 1,
+            "uniqueItems": true
+        },
+        "edition": {
+            "description": "Date of last config modification",
+            "type": "string"
+        },
+        "version": {
+            "description": "Version of current config",
+            "type": "string"
+        },
+        "adapter": {
+            "description": "Window configuration for AutoPlay Envi",
+            "$ref": "assets/.schema/adapter-v0.1.0.schema.json",
+            "type": "object"
+        },
+        "interval": {
+            "description": "Refresh interval",
+            "type": "number",
+            "exclusiveMinimum": 0
+        },
+        "recover": {
+            "description": "Store captures to local storage",
+            "type": "boolean"
+        },
+        "targets": {
+            "description": "Targets schema",
+            "type": "object"
+        },
+        "rules": {
+            "description": "Targets schema",
+            "type": "object"
+        }
+    },
+    "required": [
+        "title",
+        "author",
+        "version",
+        "adapter",
+        "targets"
+    ]
+}

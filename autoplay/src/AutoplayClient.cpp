@@ -25,7 +25,7 @@ namespace APlay {
             void _Start() {
                 _thread = std::thread([&]() {
 
-                    printf("Configuration: %s v%s\n", _config->GetCfgName().c_str(), _config->GetVersion().c_str() );
+                    printf("\nConfiguration: %s v%s\n", _config->GetTitle().c_str(), _config->GetVersion().c_str() );
                     printf("%s %s\n\n", _config->GetAuthor().at(0).c_str(), _config->GetEdition().c_str() );
 
                     // _actionTree = ActionTree::CreateActionTree(_config);

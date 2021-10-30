@@ -1,0 +1,16 @@
+{
+    "description": "Schema for targets instances of configuration",
+    "type": "object",
+    "patternProperties": {
+        "text": {
+            "decription": "Value of text field for detection",
+            "type": "string"
+        },
+        "path": {
+            "decription": "Path to image for detection",
+            "type": "string"
+        }
+    },
+    "minProperties": 1,
+    "maxProperties": 1
+}
