@@ -5,109 +5,126 @@
 #include <EnviUtils.h>
 #include <thread>
 
+#include "AutoplayVisualProcessor.h"
+#include "AutoplayLog.h"
 
 namespace APlay {
 
     class AutoplayClient : public IAutoplayClient {
-        public:
-            AutoplayClient(std::shared_ptr<AutoplayJsonConfig> config) : _config(config) {
-                _actionTree = CreateActionTree(_config);
-                _visualizer = CreateCmdVisualizer(_config);
-            }
+    public:
+        AutoplayClient(std::shared_ptr<AutoplayJsonConfig> config) : _config(config) {
+            _actionTree = CreateActionTree(_config);
+            _visualizer = CreateCmdVisualizer(_config);
+        }
 
-            ~AutoplayClient() {
-                _terminate = true;
-            }
+        ~AutoplayClient() {
+            _terminate = true;
+        }
 
-            virtual void Pause() override { _captureManager->Pause(); _visualizer->Stop(); }
+        virtual void Pause() override {
+            APLAY_PROFILE_FUNCTION();
+            _captureManager->Pause(); _visualizer->Stop();
+        }
 
-            virtual bool IsPaused() override { return _captureManager->IsPaused(); }
+        virtual bool IsPaused() override {
+            return _captureManager->IsPaused();
+        }
 
-            virtual void Resume() override { _captureManager->Resume(); }
+        virtual void Resume() override {
+            APLAY_PROFILE_FUNCTION();
+            _captureManager->Resume();
+        }
 
-            void _Start() {
-                _thread = std::thread(
-                    [&]() {
+        void _Start() {
+            _thread = std::thread(
+                [&]() {
+                    {
+                    APLAY_PROFILE_SCOPE("void AuoplayClient::_Start threaded lambda");
+                    printf("Configuration: %s v%s\n", _config->GetTitle().c_str(), _config->GetVersion().c_str() );
+                    printf("%s %s\n\n", _config->GetAuthor().at(0).c_str(), _config->GetEdition().c_str() );
 
-                        printf("Configuration: %s v%s\n", _config->GetTitle().c_str(), _config->GetVersion().c_str() );
-                        printf("%s %s\n\n", _config->GetAuthor().at(0).c_str(), _config->GetEdition().c_str() );
-                        static auto lastTimer = std::chrono::high_resolution_clock::now();
+                    #if defined(_DEBUG)
+                        APLAY_CONSOLE_INFO("Action tree initialized with {} targets, {} rules",
+                            _actionTree->_registry->getComponentArraySize<TargetComponent>(),
+                            _actionTree->_registry->getComponentArraySize<RuleComponent>()
+                        );
+                        APLAY_CONSOLE_INFO("Expected refresh rate {}(tps) | {}(ms)",
+                            (int)(1000 / _config->GetInterval()),
+                            _config->GetInterval()
+                        );
+                        printf("\n");
+                    #endif
 
-                        #if defined(_DEBUG)
-                            printf("Debug info\n");
+                    auto capConfig = Envi::CreateWindowCaptureConfiguration([&]() -> std::vector<Envi::Window> {
+                        APLAY_PROFILE_SCOPE("void AutoplayClient::_Start CreateWindowCaptureConfiguration");
+                        std::vector<Envi::Window> windows;
+                        static bool _firstCall = true;
 
-                            printf("  Targets: %d, rules: %d\n",
-                                _actionTree->_registry->getComponentArraySize<TargetComponent>(),
-                                _actionTree->_registry->getComponentArraySize<RuleComponent>()
-                            );
-
-                            printf("  Refresh: %dtps\n", (int)(1000 / _config->GetInterval()) );
-                            printf("  Recover: %s\n\n", _config->GetRecover() ? "true" : "false" );
-                        #endif
-
-                        auto capConfig = Envi::CreateWindowCaptureConfiguration([&]() -> std::vector<Envi::Window> {
-                            std::vector<Envi::Window> windows;
-
-                            switch (_config->GetFindTitleMethodInt()) {
-                                case (AutoplayClientFindWindowMethod::WithKeywords): {
-                                    windows = Envi::GetWindowsWithNameKeywords(_config->GetWindowTitle());
-                                    break;
-                                }
-                                case (AutoplayClientFindWindowMethod::Match): {
-                                    windows = Envi::GetWindowsWithNameContains(_config->GetWindowTitle().at(0));
-                                    break;
-                                }
-                                case (AutoplayClientFindWindowMethod::None): {
-                                    windows = Envi::GetWindowsWithNameKeywords(_config->GetWindowTitle());
-                                    break;
-                                }
+                        switch (_config->GetFindTitleMethodInt()) {
+                            case (AutoplayClientFindWindowMethod::WithKeywords): {
+                                windows = Envi::GetWindowsWithNameKeywords(_config->GetWindowTitle());
+                                break;
                             }
-
-                            if (windows.size()) { printf("Found: %s\n\n", windows.at(0).Name ); }
-                            return windows;
-                        });
-
-                        capConfig->SetTickInterval(_config->GetInterval());
-                        capConfig->SetRecoverImages(_config->GetRecover());
-
-                        capConfig->OnNewFrame([&](const Envi::Image &img, const Envi::Window &window) {
-                            _visualizer->PassInterval(
-                                std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::high_resolution_clock::now() - lastTimer).count()
-                            );
-
-                            lastTimer = std::chrono::high_resolution_clock::now();
-                        });
-
-                        _captureManager = capConfig->startCapturing();
-                        _visualizer->Start();
-
-                        while (!_terminate) {
-                            std::this_thread::sleep_for(std::chrono::milliseconds(_config->GetInterval()));
+                            case (AutoplayClientFindWindowMethod::Match): {
+                                windows = Envi::GetWindowsWithNameContains(_config->GetWindowTitle().at(0));
+                                break;
+                            }
+                            case (AutoplayClientFindWindowMethod::None): {
+                                windows = Envi::GetWindowsWithNameKeywords(_config->GetWindowTitle());
+                                break;
+                            }
                         }
+                        if (windows.size()) {
+                            if (_firstCall) {
+                                APLAY_CONSOLE_INFO("Found window: {}", windows.at(0).Name);
+                                printf("\n");
+                            }
+                            _firstCall = false;
+                        }
+                        return windows;
+                    });
+
+                    capConfig->SetTickInterval(_config->GetInterval());
+                    capConfig->SetRecoverImages(_config->GetRecover());
+
+                    capConfig->OnNewFrame([&](const Envi::Image &img, const Envi::Window &window) {
+                        APLAY_PROFILE_FUNCTION();
+
+                        AutoplayVisualProcessor processor(_actionTree);
+                        processor.ProcessImage(img);
+                    });
+
+                    _captureManager = capConfig->startCapturing();
                     }
-                );
 
-                _paused = false;
-                _terminate = false;
-                _thread.detach();
-            }
+                    while (!_terminate) {
+                        std::this_thread::sleep_for(std::chrono::milliseconds(_config->GetInterval()));
+                    }
+                }
+            );
 
-        private:
-            bool _paused = false;
-            bool _terminate = false;
+            _thread.detach();
+            _paused = false;
+            _terminate = false;
+        }
 
-            std::thread _thread;
+    private:
+        bool _paused = false;
+        bool _terminate = false;
 
-            std::shared_ptr<AutoplayJsonConfig> _config;
-            std::shared_ptr<Envi::ICapturerManager> _captureManager;
+        std::thread _thread;
 
-            std::shared_ptr<ActionTree> _actionTree;
+        std::shared_ptr<AutoplayJsonConfig> _config;
+        std::shared_ptr<Envi::ICapturerManager> _captureManager;
 
-            std::shared_ptr<IAutoplayCmdVisualizer> _visualizer;
+        std::shared_ptr<ActionTree> _actionTree;
+
+        std::shared_ptr<IAutoplayCmdVisualizer> _visualizer;
 
     };
 
     std::shared_ptr<IAutoplayClient> CreateAutoplayClient(std::shared_ptr<AutoplayJsonConfig> config) {
+        APLAY_PROFILE_FUNCTION();
         auto client = std::make_shared<AutoplayClient>(config);
         client->_Start();
         return client;

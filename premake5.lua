@@ -10,6 +10,8 @@ solution 'AutoPlay'
 
     bindir = '%{wks.location}/bin'
 
+include 'opencv.lua'
 include 'autoplay/vendor/envi'
 include 'autoplay/vendor/jsoncpp'
+include 'autoplay/vendor/spdlog'
 include 'autoplay'

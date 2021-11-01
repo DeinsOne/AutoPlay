@@ -1,4 +1,5 @@
 #include "AutoplayCmdVisializer.h"
+#include "AutoplayLog.h"
 
 #include <indicators/indeterminate_progress_bar.hpp>
 #include <indicators/cursor_control.hpp>
@@ -19,6 +20,7 @@ namespace APlay {
                 rootThread = std::thread(
                     [&]() {
                         indicators::IndeterminateProgressBar bar{
+                            // indicators::option::HideBarWhenComplete{true},
                             indicators::option::BarWidth{indicators::terminal_width() - 30},
                             indicators::option::Start{" ["},
                             indicators::option::Fill{"·"},
@@ -41,6 +43,7 @@ namespace APlay {
 
                         }
 
+                        bar.mark_as_completed();
                         indicators::show_console_cursor(true);
                     }
                 );
@@ -54,6 +57,7 @@ namespace APlay {
             }
 
             virtual void PassInterval(const int& _interval) override {
+                // AutoplayLogger::Get().log->info("CmdVisualizer pass new interval {}ms", _interval);
                 currentInterval = _interval;
             }
 
@@ -67,6 +71,7 @@ namespace APlay {
 
 
     std::shared_ptr<IAutoplayCmdVisualizer> CreateCmdVisualizer(const std::shared_ptr<AutoplayJsonConfig>& _config) {
+        APLAY_PROFILE_FUNCTION();
         return std::make_shared<AutoplayCmdVisualizer>(_config);
     }
 

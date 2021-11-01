@@ -15,7 +15,11 @@ project 'autoplay'
         'vendor/cxxopts',
         'vendor/jsoncpp/include',
         'vendor/valijson',
-        'vendor/indicators/include'
+        'vendor/indicators/include',
+        'vendor/spdlog/include',
+
+        '%{opencv.include.cv4}',
+        '%{opencv.include.cv2}'
     }
 
     files {
@@ -24,12 +28,24 @@ project 'autoplay'
         'src/AutoplayJsonConfig.cpp',
         'src/AutoplayClient.cpp',
         'src/AutoplayActionTree.cpp',
-        'src/AutoplayCmdVisializer.cpp'
+        'src/AutoplayCmdVisializer.cpp',
+        'src/AutoplayVisualProcessor.cpp',
+        'src/AutoplayLog.cpp'
+    }
+
+    libdirs {
+        '%{opencv.lib}'
     }
 
     links {
         'envi',
-        'json'
+        'json',
+
+        '%{opencv.libs.core}',
+        '%{opencv.libs.flann}',
+        '%{opencv.libs.highgui}',
+        '%{opencv.libs.imgproc}',
+        '%{opencv.libs.dnn}'
     }
 
     filter 'system:linux'
@@ -43,7 +59,8 @@ project 'autoplay'
 
     filter 'configurations:Debug'
         defines {
-            '_DEBUG'
+            '_DEBUG',
+            'APLAY_PROFILING'
         }
 		runtime 'Debug'
 		symbols 'on'
