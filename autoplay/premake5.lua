@@ -2,7 +2,7 @@
 project 'autoplay'
     language 'C++'
     kind 'ConsoleApp'
-    cppdialect 'C++17'
+    cppdialect 'gnu++17'
     staticruntime 'on'
 
     objdir      (bindir)
@@ -11,6 +11,7 @@ project 'autoplay'
 
     includedirs {
         'include',
+        'include/processor',
         'vendor/envi/include',
         'vendor/cxxopts',
         'vendor/jsoncpp/include',
@@ -29,7 +30,9 @@ project 'autoplay'
         'src/AutoplayClient.cpp',
         'src/AutoplayActionTree.cpp',
         'src/AutoplayCmdVisializer.cpp',
-        'src/AutoplayVisualProcessor.cpp',
+        'src/processor/AutoplayVisualProcessor.cpp',
+        'src/processor/AutopleyNetwork.cpp',
+        'src/processor/AutoplayTextProcessor.cpp',
         'src/AutoplayLog.cpp'
     }
 
@@ -45,7 +48,12 @@ project 'autoplay'
         '%{opencv.libs.flann}',
         '%{opencv.libs.highgui}',
         '%{opencv.libs.imgproc}',
-        '%{opencv.libs.dnn}'
+        '%{opencv.libs.dnn}',
+
+        '%{opencv.libs.video}',
+        '%{opencv.libs.imgcodecs}',
+        '%{opencv.libs.videoio}',
+        '%{opencv.libs.objdetect}'
     }
 
     filter 'system:linux'

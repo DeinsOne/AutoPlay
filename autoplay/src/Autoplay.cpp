@@ -45,6 +45,8 @@ int main(int argc, char** argv) {
 
     // Main loop
     while (true) {
+        APLAY_PROFILE_SCOPE("void main(int argc, char** argv) Main loop");
+
         // Shortcut to exit Autoplay
         if (Envi::IsKeyPressed(Envi::KeyCodes::KEY_LeftControl) &&
             Envi::IsKeyPressed(Envi::KeyCodes::KEY_W)

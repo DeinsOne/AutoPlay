@@ -1,7 +1,7 @@
 -- OpenCV dependencies
 opencv = {}
 
-opencv['bin'] = '/home/deins/Code/opencv/libopencv/bin'
+opencv['bin'] = 'vendor/libopencv/bin'
 
 opencv['include'] = {
     cv4 = 'vendor/libopencv/include',

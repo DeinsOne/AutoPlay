@@ -15,6 +15,8 @@ namespace APlay {
         AutoplayClient(std::shared_ptr<AutoplayJsonConfig> config) : _config(config) {
             _actionTree = CreateActionTree(_config);
             _visualizer = CreateCmdVisualizer(_config);
+            AutoplayTextProcessor::Init();
+            printf("\n");
         }
 
         ~AutoplayClient() {
@@ -36,9 +38,8 @@ namespace APlay {
         }
 
         void _Start() {
-            _thread = std::thread(
-                [&]() {
-                    {
+            _thread = std::thread([&]() {
+                {
                     APLAY_PROFILE_SCOPE("void AuoplayClient::_Start threaded lambda");
                     printf("Configuration: %s v%s\n", _config->GetTitle().c_str(), _config->GetVersion().c_str() );
                     printf("%s %s\n\n", _config->GetAuthor().at(0).c_str(), _config->GetEdition().c_str() );
@@ -99,9 +100,8 @@ namespace APlay {
 
                     while (!_terminate) {
                         std::this_thread::sleep_for(std::chrono::milliseconds(_config->GetInterval()));
-                    }
                 }
-            );
+            });
 
             _thread.detach();
             _paused = false;
