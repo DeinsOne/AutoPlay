@@ -33,6 +33,7 @@ project 'autoplay'
         'src/processor/AutoplayVisualProcessor.cpp',
         'src/processor/AutopleyNetwork.cpp',
         'src/processor/AutoplayTextProcessor.cpp',
+        'src/processor/AutoplayProcessManager.cpp',
         'src/AutoplayLog.cpp'
     }
 

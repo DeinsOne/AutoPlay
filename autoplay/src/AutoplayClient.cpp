@@ -42,7 +42,8 @@ namespace APlay {
                 {
                     APLAY_PROFILE_SCOPE("void AuoplayClient::_Start threaded lambda");
                     printf("Configuration: %s v%s\n", _config->GetTitle().c_str(), _config->GetVersion().c_str() );
-                    printf("%s %s\n\n", _config->GetAuthor().at(0).c_str(), _config->GetEdition().c_str() );
+                    printf("%s %s\n", _config->GetAuthor().at(0).c_str(), _config->GetEdition().c_str() );
+                    printf("Hardware threads: %d\n\n", std::thread::hardware_concurrency());
 
                     #if defined(_DEBUG)
                         APLAY_CONSOLE_INFO("Action tree initialized with {} targets, {} rules",
