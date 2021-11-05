@@ -1,12 +1,12 @@
 #include "AutoplayClient.h"
+
 #include "AutoplayActionTree.h"
-#include "AutoplayCmdVisializer.h"
+#include "AutoplayVisualProcessor.hpp"
+#include "AutoplayLog.h"
+
 #include <Envi.h>
 #include <EnviUtils.h>
 #include <thread>
-
-#include "AutoplayVisualProcessor.h"
-#include "AutoplayLog.h"
 
 namespace APlay {
 
@@ -14,9 +14,7 @@ namespace APlay {
     public:
         AutoplayClient(std::shared_ptr<AutoplayJsonConfig> config) : _config(config) {
             _actionTree = CreateActionTree(_config);
-            _visualizer = CreateCmdVisualizer(_config);
-            AutoplayTextProcessor::Init();
-            printf("\n");
+            _visualProcessor = std::make_shared<AutoplayVisualProcessor<AutoplayTextDetectorEAST, AutoplayTextRecognizerCRNN>>(config, _actionTree);
         }
 
         ~AutoplayClient() {
@@ -25,7 +23,8 @@ namespace APlay {
 
         virtual void Pause() override {
             APLAY_PROFILE_FUNCTION();
-            _captureManager->Pause(); _visualizer->Stop();
+            _captureManager->Pause();
+            _paused = true;
         }
 
         virtual bool IsPaused() override {
@@ -91,16 +90,14 @@ namespace APlay {
 
                     capConfig->OnNewFrame([&](const Envi::Image &img, const Envi::Window &window) {
                         APLAY_PROFILE_FUNCTION();
-
-                        AutoplayVisualProcessor processor(_actionTree);
-                        processor.ProcessImage(img);
+                        _visualProcessor->ProcessImage(img);
                     });
 
                     _captureManager = capConfig->startCapturing();
-                    }
+                }
 
-                    while (!_terminate) {
-                        std::this_thread::sleep_for(std::chrono::milliseconds(_config->GetInterval()));
+                while (!_terminate) {
+                    std::this_thread::sleep_for(std::chrono::milliseconds(_config->GetInterval()));
                 }
             });
 
@@ -120,7 +117,7 @@ namespace APlay {
 
         std::shared_ptr<ActionTree> _actionTree;
 
-        std::shared_ptr<IAutoplayCmdVisualizer> _visualizer;
+        std::shared_ptr<AutoplayVisualProcessor<AutoplayTextDetectorEAST, AutoplayTextRecognizerCRNN>> _visualProcessor;
 
     };
 

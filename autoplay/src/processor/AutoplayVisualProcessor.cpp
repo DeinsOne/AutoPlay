@@ -1,4 +1,4 @@
-#include "AutoplayVisualProcessor.h"
+#include "AutoplayVisualProcessor.hpp"
 #include "EnviUtils.h"
 
 #include <opencv4/opencv2/imgcodecs.hpp>
@@ -21,19 +21,25 @@ namespace Envi {
     }
 }
 
-void APlay::AutoplayVisualProcessor::ProcessImage(const Envi::Image &img) {
-    APLAY_PROFILE_FUNCTION();
+namespace APlay {
 
-    convertedData = std::shared_ptr<unsigned char>(
-        (unsigned char*)malloc(Envi::Height(img) * Envi::Width(img) * sizeof(Envi::ImageBGRA))
-    );
+    void _AutoplayVisualProcessorProcessImage(
+        const Envi::Image &img,
+        const _Tree& actionTree,
+        std::shared_ptr<unsigned char>& convertedData,
+        const std::shared_ptr<BaseTextProcessor>& textProcessor
+    ) {
+        convertedData = std::shared_ptr<unsigned char>(
+            (unsigned char*)malloc(Envi::Height(img) * Envi::Width(img) * sizeof(Envi::ImageBGRA))
+        );
 
-    cv::Mat converted(Envi::Height(img), Envi::Width(img), CV_8UC3, convertedData.get());
-    {
-        APLAY_PROFILE_SCOPE("ExtractAndConvertToRGBA Envi::Image -> cv::Mat");
-        Envi::ExtractAndConvertToRGB(img, convertedData.get());
+        cv::Mat converted(Envi::Height(img), Envi::Width(img), CV_8UC3, convertedData.get());
+        {
+            APLAY_PROFILE_SCOPE("ExtractAndConvertToRGBA Envi::Image -> cv::Mat");
+            Envi::ExtractAndConvertToRGB(img, convertedData.get());
+        }
+
+        textProcessor->ProcessImage(converted);
     }
 
-    AutoplayTextProcessor::ProcessImage(converted, actionTree);
 }
-

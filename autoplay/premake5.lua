@@ -29,7 +29,7 @@ project 'autoplay'
         'src/AutoplayJsonConfig.cpp',
         'src/AutoplayClient.cpp',
         'src/AutoplayActionTree.cpp',
-        'src/AutoplayCmdVisializer.cpp',
+        -- 'src/AutoplayCmdVisializer.cpp',
         'src/processor/AutoplayVisualProcessor.cpp',
         'src/processor/AutopleyNetwork.cpp',
         'src/processor/AutoplayTextProcessor.cpp',

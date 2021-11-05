@@ -1,4 +1,4 @@
-#include "AutoplayVisualProcessor.h"
+#include "AutoplayVisualProcessor.hpp"
 #include "AutoplayProcessManager.h"
 #include "AutoplayLog.h"
 
@@ -7,66 +7,59 @@
 
 namespace APlay {
 
-    using PointVec = std::vector<std::vector<cv::Point>>;
-
-    std::shared_ptr<AutoplayTextDetectionModel_EAST> AutoplayTextProcessor::_textDetector;
-    std::shared_ptr<AutoplayTextRecognitionModel> AutoplayTextProcessor::_textRecognizer;
+    using _Configuration = std::shared_ptr<AutoplayJsonConfig>;
+    using _Tree = std::shared_ptr<ActionTree>;
+    using _PointVec = std::vector<std::vector<cv::Point>>;
+    using _Dictionary = std::vector<std::string>;
 
     void fourPointsTransform(const cv::Mat& frame, const cv::Point2f vertices[], cv::Mat& result);
 
-    void AutoplayTextProcessor::Init() {
+    void AutoplayTextDetectorEAST::Init(const _Configuration& config) {
         APLAY_PROFILE_FUNCTION();
-        _textRecognizer = CreateTextRecognitionModel(
-            "assets/.model/crnn_cs.onnx",
-            "assets/.model/alphabet_94.txt"
-        );
-
-        _textDetector = CreateTextDetectionModelEAST(
+        _model = CreateTextDetectionModelEAST(
             "assets/.model/frozen_east_text_detection.pb",
             0.1, 0.2,
             {320, 736}
         );
     }
 
-    void AutoplayTextProcessor::ProcessImage(cv::Mat& image, const std::shared_ptr<ActionTree>& actionTree) {
+    void AutoplayTextRecognizerCRNN::Init(const _Configuration& config) {
         APLAY_PROFILE_FUNCTION();
+        _model = CreateTextRecognitionModel(
+            "assets/.model/crnn_cs.onnx",
+            "assets/.model/alphabet_94.txt"
+        );
+    }
 
-        if (!_textDetector) {
-            APLAY_CONSOLE_CRITICAL("Network is not preloaded!");
-        }
+    void AutoplayTextDetectorEAST::ProcessImage(const cv::Mat& image) {
+        APLAY_PROFILE_FUNCTION();
+        _regions.clear();
+        _model->_model->detect(image, _regions);
+        APLAY_CONSOLE_INFO("AutoplayTextDetectorEAST detected {} results", _regions.size());
+    }
 
-        PointVec detectResults;
+    void AutoplayTextRecognizerCRNN::ProcessImage(const cv::Mat& image) {
+        APLAY_PROFILE_FUNCTION();
+        std::mutex _blockData;
 
-        {
-            APLAY_PROFILE_SCOPE("_textDetector->_model->detect()");
-            _textDetector->_model->detect(image, detectResults);
-            APLAY_CONSOLE_INFO("AutoplayTextProcessor detected {} results", detectResults.size());
-        }
+        auto manager = CreateProcessManager<_PointVec, _PointVec::iterator>(_regions, [&](_PointVec container) -> int {
+            for (auto i : container) {
+                cv::Mat cropped;
 
-        {
-            APLAY_PROFILE_SCOPE("_textRecognizer->_model->recognize()");
+                std::vector<cv::Point2f> quadrangle_2f;
+                for (int j = 0; j < 4; j++)
+                    quadrangle_2f.emplace_back(i[j]);
 
-            std::mutex _blockData;
+                fourPointsTransform(image, quadrangle_2f.data(), cropped);
 
-            auto manager = CreateProcessManager<PointVec, PointVec::iterator>(detectResults, [&image, &_blockData](PointVec container) -> int {
-                for (auto i : container) {
-                    cv::Mat cropped;
-
-                    std::vector<cv::Point2f> quadrangle_2f;
-                    for (int j = 0; j < 4; j++)
-                        quadrangle_2f.emplace_back(i[j]);
-
-                    fourPointsTransform(image, quadrangle_2f.data(), cropped);
-                    {
-                        std::lock_guard<std::mutex> lk(_blockData);
-                        // FIXME: add text to action tree
-                        std::string recognitionResult = AutoplayTextProcessor::_textRecognizer->_model->recognize(cropped);
-                    }
+                {
+                    std::lock_guard<std::mutex> lk(_blockData);
+                    _dict.emplace_back(_model->_model->recognize(cropped));
                 }
-                return 0;
-            });
-            manager->_execute();
-        }
+            }
+            return 0;
+        });
+        manager->_execute();
     }
 
     void fourPointsTransform(const cv::Mat& frame, const cv::Point2f vertices[], cv::Mat& result) {
@@ -82,6 +75,11 @@ namespace APlay {
 
         cv::warpPerspective(frame, result, rotationMatrix, outputSize);
     }
+
+    void _AutoplayTextProcessorUpdateTree(const std::shared_ptr<AutoplayTextDetector>& detector, const std::shared_ptr<AutoplayTextRecognizer>& recognizer, const _Tree& actionTree) {
+
+    }
+
 
 }
 
