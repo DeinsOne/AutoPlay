@@ -1,6 +1,7 @@
 #pragma once
 
 #include "AutoplayCore.h"
+#include "AutoplayLog.h"
 
 #include <fstream>
 #include <iostream>
@@ -27,6 +28,7 @@ namespace APlay {
             }
 
             ConfigValidator(std::string _filename, const Json::Value& _value) : value(_value), filename(_filename) {
+                APLAY_PROFILE_FUNCTION();
                 _detectVersion();
                 Validate();
             }

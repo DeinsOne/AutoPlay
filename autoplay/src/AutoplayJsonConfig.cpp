@@ -2,6 +2,8 @@
 #include "AutoplayClient.h"
 #include "ConfigValidator.h"
 
+#include "AutoplayLog.h"
+
 namespace APlay {
 
     enum _JsonValueType {
@@ -12,6 +14,7 @@ namespace APlay {
 
     template<typename TReal>
     void initValue(const char* id, Json::Value& json, Ecs::Entity* registry, const short& type ) {
+        APLAY_PROFILE_FUNCTION();
         if (!json[id].empty() ) {
             auto realType = Ecs::__getComponentTypeID<TReal>();
 
@@ -42,13 +45,16 @@ namespace APlay {
     }
 
     JsonReader JsonParser::Init() {
+        APLAY_PROFILE_FUNCTION();
         _root = std::make_shared<Ecs::Entity>();
 
         std::ifstream configFile(_file.c_str());
         configFile >> _jsvalue;
         configFile.close();
 
+        // AutoplayLogger::Get().log->info("JsonConfig validating...");
         ConfigValidator valid(_file, _jsvalue);
+        // AutoplayLogger::Get().log->info("Validation finoshed with status: {}", valid.GetStatus());
 
         initValue<std::string>("title", _jsvalue, _root.get(),
             _JsonValueType::_value_singel
@@ -147,14 +153,17 @@ namespace APlay {
 
 
     std::shared_ptr<IParser<JsonReader>> CreateParser(const char* file) {
+        APLAY_PROFILE_FUNCTION();
         return std::make_shared<JsonParser>(file);
     }
 
     std::shared_ptr<AutoplayJsonConfig> CreateJsonConfig(std::string file) {
+        APLAY_PROFILE_FUNCTION();
         return std::make_shared<AutoplayJsonConfig>(file);
     }
 
     std::shared_ptr<AutoplayJsonConfig> CreateJsonConfig(const std::shared_ptr<AutoplayCmdConfig>& config) {
+        APLAY_PROFILE_FUNCTION();
         return std::make_shared<AutoplayJsonConfig>(config);
     }
 

@@ -1,6 +1,7 @@
 /.vscode
 /tmp
 /bin
+/autoplay/vendor/libopencv
 
 /*.sln
 /Makefile

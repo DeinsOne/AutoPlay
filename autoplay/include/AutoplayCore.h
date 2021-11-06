@@ -2,6 +2,7 @@
 #define __AUTOPLAY_CORE
 
 #include <memory>
+// #include "AutoplayLog.h"
 #include "ecs/uecs.h"
 #include "ecs/components.h"
 

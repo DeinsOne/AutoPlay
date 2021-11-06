@@ -16,12 +16,12 @@ namespace APlay {
     };
 
     class IAutoplayClient {
-        public:
-            virtual void Pause() = 0;
+    public:
+        virtual void Pause() = 0;
 
-            virtual bool IsPaused() = 0;
+        virtual bool IsPaused() = 0;
 
-            virtual void Resume() = 0;
+        virtual void Resume() = 0;
 
     };
 

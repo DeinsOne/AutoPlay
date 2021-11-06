@@ -2,7 +2,7 @@
 project 'autoplay'
     language 'C++'
     kind 'ConsoleApp'
-    cppdialect 'C++17'
+    cppdialect 'gnu++17'
     staticruntime 'on'
 
     objdir      (bindir)
@@ -11,10 +11,16 @@ project 'autoplay'
 
     includedirs {
         'include',
+        'include/processor',
         'vendor/envi/include',
         'vendor/cxxopts',
         'vendor/jsoncpp/include',
-        'vendor/valijson'
+        'vendor/valijson',
+        'vendor/indicators/include',
+        'vendor/spdlog/include',
+
+        '%{opencv.include.cv4}',
+        '%{opencv.include.cv2}'
     }
 
     files {
@@ -22,12 +28,33 @@ project 'autoplay'
         'src/AutoplayCmdConfig.cpp',
         'src/AutoplayJsonConfig.cpp',
         'src/AutoplayClient.cpp',
-        'src/AutoplayActionTree.cpp'
+        'src/AutoplayActionTree.cpp',
+        -- 'src/AutoplayCmdVisializer.cpp',
+        'src/processor/AutoplayVisualProcessor.cpp',
+        'src/processor/AutopleyNetwork.cpp',
+        'src/processor/AutoplayTextProcessor.cpp',
+        'src/processor/AutoplayProcessManager.cpp',
+        'src/AutoplayLog.cpp'
+    }
+
+    libdirs {
+        '%{opencv.lib}'
     }
 
     links {
         'envi',
-        'json'
+        'json',
+
+        '%{opencv.libs.core}',
+        '%{opencv.libs.flann}',
+        '%{opencv.libs.highgui}',
+        '%{opencv.libs.imgproc}',
+        '%{opencv.libs.dnn}',
+
+        '%{opencv.libs.video}',
+        '%{opencv.libs.imgcodecs}',
+        '%{opencv.libs.videoio}',
+        '%{opencv.libs.objdetect}'
     }
 
     filter 'system:linux'
@@ -41,7 +68,8 @@ project 'autoplay'
 
     filter 'configurations:Debug'
         defines {
-            '_DEBUG'
+            '_DEBUG',
+            'APLAY_PROFILING'
         }
 		runtime 'Debug'
 		symbols 'on'

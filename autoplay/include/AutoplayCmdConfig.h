@@ -26,7 +26,10 @@ namespace APlay {
 
     class AutoplayCmdConfig : public CmdParser {
         public:
-            AutoplayCmdConfig(int argc, char** argv) : CmdParser(argc, argv) { Init(); }
+            AutoplayCmdConfig(int argc, char** argv) : CmdParser(argc, argv) {
+                Init();
+                // AutoplayLogger::Get().log->info("CmdConfig created and initialized");
+            }
 
             std::string GetCfgFile();
 

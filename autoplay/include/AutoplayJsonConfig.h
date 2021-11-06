@@ -29,7 +29,10 @@ namespace APlay {
             std::shared_ptr<AutoplayCmdConfig> _cmdconfig;
 
         public:
-            AutoplayJsonConfig(std::string file) : JsonParser(file.c_str()) { Init(); }
+            AutoplayJsonConfig(std::string file) : JsonParser(file.c_str()) {
+                Init();
+                // AutoplayLogger::Get().log->info("JsonConfig created and initialized");
+            }
 
             AutoplayJsonConfig(const std::shared_ptr<AutoplayCmdConfig>& config) : JsonParser(config->GetCfgFile().c_str()), _cmdconfig(config) { Init(); }
 

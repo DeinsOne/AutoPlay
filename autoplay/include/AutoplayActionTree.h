@@ -3,6 +3,8 @@
 #include "AutoplayJsonConfig.h"
 #include "ecs/uecs.h"
 
+#include "AutoplayLog.h"
+
 #include <memory>
 #include <exception>
 #include <iostream>
@@ -53,6 +55,7 @@ namespace APlay {
     }
 
     inline std::shared_ptr<ActionTree> CreateActionTree(const std::shared_ptr<AutoplayJsonConfig> config) {
+        APLAY_PROFILE_FUNCTION();
         return std::make_shared<ActionTree>(config);
     }
 
