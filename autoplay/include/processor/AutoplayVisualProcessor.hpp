@@ -33,7 +33,7 @@ namespace APlay {
 
 
 
-    class AutoplayTextDetectorEAST : public AutoplayTextDetector {
+    class AutoplayTextDetectorNative : public AutoplayTextDetector {
     public:
         virtual void Init(const _Configuration& config) override;
 
@@ -52,7 +52,7 @@ namespace APlay {
         _PointVec _regions;
     };
 
-    class AutoplayTextRecognizerCRNN : public AutoplayTextRecognizer {
+    class AutoplayTextRecognizerNative : public AutoplayTextRecognizer {
     public:
         virtual void Init(const _Configuration& config) override;
 

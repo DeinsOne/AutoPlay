@@ -14,7 +14,7 @@ namespace APlay {
 
     void fourPointsTransform(const cv::Mat& frame, const cv::Point2f vertices[], cv::Mat& result);
 
-    void AutoplayTextDetectorEAST::Init(const _Configuration& config) {
+    void AutoplayTextDetectorNative::Init(const _Configuration& config) {
         APLAY_PROFILE_FUNCTION();
         _model = CreateTextDetectionModelEAST(
             "assets/.model/frozen_east_text_detection.pb",
@@ -23,7 +23,7 @@ namespace APlay {
         );
     }
 
-    void AutoplayTextRecognizerCRNN::Init(const _Configuration& config) {
+    void AutoplayTextRecognizerNative::Init(const _Configuration& config) {
         APLAY_PROFILE_FUNCTION();
         _model = CreateTextRecognitionModel(
             "assets/.model/crnn_cs.onnx",
@@ -31,14 +31,14 @@ namespace APlay {
         );
     }
 
-    void AutoplayTextDetectorEAST::ProcessImage(const cv::Mat& image) {
+    void AutoplayTextDetectorNative::ProcessImage(const cv::Mat& image) {
         APLAY_PROFILE_FUNCTION();
         _regions.clear();
         _model->_model->detect(image, _regions);
-        APLAY_CONSOLE_INFO("AutoplayTextDetectorEAST detected {} results", _regions.size());
+        APLAY_CONSOLE_INFO("AutoplayTextDetectorNative detected {} results", _regions.size());
     }
 
-    void AutoplayTextRecognizerCRNN::ProcessImage(const cv::Mat& image) {
+    void AutoplayTextRecognizerNative::ProcessImage(const cv::Mat& image) {
         APLAY_PROFILE_FUNCTION();
         std::mutex _blockData;
 

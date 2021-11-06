@@ -2,7 +2,6 @@
 /tmp
 /bin
 /autoplay/vendor/libopencv
-/assets/.model/
 
 /*.sln
 /Makefile

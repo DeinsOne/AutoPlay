@@ -14,7 +14,7 @@ namespace APlay {
     public:
         AutoplayClient(std::shared_ptr<AutoplayJsonConfig> config) : _config(config) {
             _actionTree = CreateActionTree(_config);
-            _visualProcessor = std::make_shared<AutoplayVisualProcessor<AutoplayTextDetectorEAST, AutoplayTextRecognizerCRNN>>(config, _actionTree);
+            _visualProcessor = std::make_shared<AutoplayVisualProcessor<AutoplayTextDetectorNative, AutoplayTextRecognizerNative>>(config, _actionTree);
         }
 
         ~AutoplayClient() {
@@ -117,7 +117,7 @@ namespace APlay {
 
         std::shared_ptr<ActionTree> _actionTree;
 
-        std::shared_ptr<AutoplayVisualProcessor<AutoplayTextDetectorEAST, AutoplayTextRecognizerCRNN>> _visualProcessor;
+        std::shared_ptr<AutoplayVisualProcessor<AutoplayTextDetectorNative, AutoplayTextRecognizerNative>> _visualProcessor;
 
     };
 
